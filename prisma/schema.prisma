@@ -1,0 +1,80 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model pcp {
+  id             String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name           String      @unique
+  email          String      @unique
+  password       String
+  contact_number String      @unique
+  bio            String
+  address        String
+  posts          posts[]
+  comments       comments[]
+  job_filter     job_filter? @relation(fields: [job_filterId], references: [id])
+  job_filterId   String?     @db.Uuid
+}
+
+model posts {
+  id         String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title      String
+  content    String
+  created_at DateTime   @default(dbgenerated("now()"))
+  comments   comments[]
+  pcp        pcp        @relation(fields: [pcpId], references: [id])
+  pcpId      String     @db.Uuid
+  ngo        ngo?       @relation(fields: [ngoId], references: [id])
+  ngoId      String?    @db.Uuid
+}
+
+model comments {
+  id       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  comments String
+  pcp      pcp    @relation(fields: [pcpId], references: [id])
+  pcpId    String @db.Uuid
+  posts    posts  @relation(fields: [postsId], references: [id])
+  postsId  String @db.Uuid
+}
+
+model ngo {
+  id             String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name           String
+  email          String
+  password       String
+  contact_number Int
+  bio            String
+  address        String
+  job_offer      job_offer[]
+  posts          posts[]
+}
+
+model job_offer {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  profession     String
+  skills         String
+  transportation String
+  time           DateTime
+  location       String
+  salary         Int
+  description    String
+  ngo            ngo      @relation(fields: [ngoId], references: [id])
+  ngoId          String   @db.Uuid
+}
+
+model job_filter {
+  id       String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  skills   String
+  time     DateTime
+  location String
+  salary   Int
+  pcp      pcp[]
+}
