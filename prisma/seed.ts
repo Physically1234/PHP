@@ -8,11 +8,11 @@ const main = async () => {
     await prisma.posts.deleteMany();
     await prisma.pcp.deleteMany();
 
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 10; i++) {  
         await prisma.pcp.create({
             data: {
                 email: faker.internet.email(),
-                password:faker.lorem.words(),
+                password: faker.lorem.words(),
                 name: faker.internet.userName(),
                 contact_number: faker.random.numeric(),
                 bio: faker.lorem.sentence(),
@@ -22,10 +22,13 @@ const main = async () => {
                         {
                             content: faker.lorem.paragraphs(),
                             title: faker.lorem.words(10),
+                            created_at: faker.random.numeric()
+
                         },
                         {
                             content: faker.lorem.paragraphs(),
                             title: faker.lorem.words(10),
+                            created_at: faker.random.numeric()
                         }
                     ]
                 }
@@ -55,3 +58,8 @@ await Promise.all(
         });
     })
 );
+
+main()
+    .then(() => console.log("Data seeded successfully 😎🚀"))
+    .catch((e) => console.log(e))
+    .finally(async () => await prisma.$disconnect());
